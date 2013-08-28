@@ -1,0 +1,2 @@
+describe('CircuitBreaker', function() {
+});

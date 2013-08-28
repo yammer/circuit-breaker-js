@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     jasmine: {
       all: {
         src: [
-          'lib/**/*.js'
+          'circuit-breaker.js'
         ],
         options: {
           specs:   'spec/**/*.js',
