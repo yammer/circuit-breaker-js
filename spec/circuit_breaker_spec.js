@@ -76,5 +76,17 @@ describe('CircuitBreaker', function() {
 
       expect(breaker.isBroken()).toBe(false);
     });
+
+    it('should be true if errors are above the threshold', function() {
+      breaker.threshold = 75;
+
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.success();
+
+      expect(breaker.isBroken()).toBe(true);
+    });
   });
 });

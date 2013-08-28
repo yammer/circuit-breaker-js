@@ -21,7 +21,9 @@ CircuitBreaker.prototype.run = function(command) {
 };
 
 CircuitBreaker.prototype.isBroken = function() {
-  var total = this._failCount + this._successCount + 1;
+  var total = this._failCount + this._successCount;
+  if (total == 0) total = 1;
+
   var failedPercent = (this._failCount / total) * 100;
 
   return failedPercent > this.threshold;
