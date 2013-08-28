@@ -14,5 +14,15 @@ describe('CircuitBreaker', function() {
 
       expect(command).toHaveBeenCalled();
     });
+
+    it('should be able to notify the service the command was successful', function() {
+      var command = function(success) {
+        success();
+      };
+
+      breaker.run(command);
+
+      expect(breaker._successCount).toBe(1);
+    });
   });
 });
