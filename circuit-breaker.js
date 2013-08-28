@@ -20,4 +20,5 @@ CircuitBreaker.prototype.run = function(command) {
 };
 
 CircuitBreaker.prototype.isBroken = function() {
+  return this._failCount > this._successCount;
 };

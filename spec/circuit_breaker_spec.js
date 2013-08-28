@@ -55,6 +55,15 @@ describe('CircuitBreaker', function() {
     });
 
     it('should be false with successful calls', function() {
+      breaker.success();
+
+      expect(breaker.isBroken()).toBe(false);
+    });
+
+    it('should be true with failed calls', function() {
+      breaker.failed();
+
+      expect(breaker.isBroken()).toBe(true);
     });
   });
 });
