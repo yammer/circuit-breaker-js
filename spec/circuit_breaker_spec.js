@@ -3,6 +3,7 @@ describe('CircuitBreaker', function() {
   var breaker;
 
   beforeEach(function() {
+    spyOn(Math, 'random').andReturn(1);
     jasmine.Clock.useMock();
     breaker = new CircuitBreaker;
   });
@@ -122,6 +123,20 @@ describe('CircuitBreaker', function() {
       breaker.minErrors = 1;
 
       breaker.failed();
+
+      expect(breaker.isBroken()).toBe(false);
+    });
+
+    it('should let random request through to test health of the service', function() {
+      breaker.threshold = 25;
+
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.success();
+
+      Math.random.andReturn(0.05);
 
       expect(breaker.isBroken()).toBe(false);
     });

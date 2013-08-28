@@ -50,5 +50,5 @@ CircuitBreaker.prototype.isBroken = function() {
 
   var failedPercent = (failures / total) * 100;
 
-  return failedPercent > this.threshold && failures > this.minErrors;
+  return (failedPercent > this.threshold && failures > this.minErrors) && Math.random() > 0.1;
 };
