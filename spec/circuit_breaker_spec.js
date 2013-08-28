@@ -60,6 +60,7 @@ describe('CircuitBreaker', function() {
     });
 
     it('should be true with failed calls', function() {
+      breaker.minErrors = 0;
       breaker.failed();
 
       expect(breaker.isBroken()).toBe(true);
@@ -114,6 +115,15 @@ describe('CircuitBreaker', function() {
       jasmine.Clock.tick(1001);
 
       expect(breaker.isBroken()).toBe(true);
+    });
+
+    it('should not be broken without having more than minumum number of errors', function() {
+      breaker.threshold = 25; 
+      breaker.minErrors = 1;
+
+      breaker.failed();
+
+      expect(breaker.isBroken()).toBe(false);
     });
   });
 });

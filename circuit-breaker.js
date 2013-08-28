@@ -1,6 +1,7 @@
 var CircuitBreaker = function(opts) {
   var opts = opts || {};
   this.threshold = opts.threshold || 15;
+  this.minErrors = opts.minErrors || 3;
   this.duration = opts.duration || 10000;
   this.numOfBuckets = opts.numOfBuckets || 10;
   this._buckets = [{ failures: 0, successes: 0 }];
@@ -49,5 +50,5 @@ CircuitBreaker.prototype.isBroken = function() {
 
   var failedPercent = (failures / total) * 100;
 
-  return failedPercent > this.threshold;
+  return failedPercent > this.threshold && failures > this.minErrors;
 };
