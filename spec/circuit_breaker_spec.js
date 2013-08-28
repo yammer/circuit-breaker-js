@@ -3,6 +3,7 @@ describe('CircuitBreaker', function() {
   var breaker;
 
   beforeEach(function() {
+    jasmine.Clock.useMock();
     breaker = new CircuitBreaker;
   });
 
@@ -50,10 +51,6 @@ describe('CircuitBreaker', function() {
 
   describe('isBroken', function() {
 
-    beforeEach(function() {
-      jasmine.Clock.useMock();
-    });
-
     it('should be false with successful calls', function() {
       breaker.success();
 
@@ -87,6 +84,20 @@ describe('CircuitBreaker', function() {
       breaker.success();
 
       expect(breaker.isBroken()).toBe(true);
+    });
+
+    it('should ignore errors outside of the current time window', function() {
+      breaker.threshold = 75;
+
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.success();
+
+      jasmine.Clock.tick(10001);
+
+      expect(breaker.isBroken()).toBe(false);
     });
   });
 });

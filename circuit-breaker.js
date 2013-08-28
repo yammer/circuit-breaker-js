@@ -2,6 +2,7 @@ var CircuitBreaker = function() {
   this._successCount = 0;
   this._failCount = 0;
   this.threshold = 15;
+  this.rollingWindow = 10000;
 
   var self = this;
 
@@ -12,6 +13,11 @@ var CircuitBreaker = function() {
   this.failed = function() {
     self._failCount++;
   };
+
+  this._ticker = window.setInterval(function() {
+    self._failCount = 0;
+    self._successCount = 0;
+  }, this.rollingWindow);
 };
 
 CircuitBreaker.prototype.run = function(command) {
