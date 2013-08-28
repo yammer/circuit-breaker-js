@@ -1,6 +1,7 @@
 var CircuitBreaker = function() {
   this._successCount = 0;
   this._failCount = 0;
+  this.threshold = 15;
 
   var self = this;
 
@@ -20,5 +21,6 @@ CircuitBreaker.prototype.run = function(command) {
 };
 
 CircuitBreaker.prototype.isBroken = function() {
-  return this._failCount > this._successCount;
+  var failedPercent = (this._failCount / (this._failCount + this._successCount + 1)) * 100;
+  return failedPercent > this.threshold;
 };
