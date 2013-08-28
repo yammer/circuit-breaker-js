@@ -15,7 +15,7 @@ describe('CircuitBreaker', function() {
       expect(command).toHaveBeenCalled();
     });
 
-    it('should be able to notify the service the command was successful', function() {
+    it('should be able to notify the breaker if the command was successful', function() {
       var command = function(success) {
         success();
       };
@@ -23,6 +23,16 @@ describe('CircuitBreaker', function() {
       breaker.run(command);
 
       expect(breaker._successCount).toBe(1);
+    });
+
+    it('should be able to notify the breaker if the command failed', function() {
+      var command = function(success, failed) {
+        failed();
+      };
+
+      breaker.run(command);
+
+      expect(breaker._failCount).toBe(1);
     });
   });
 });
