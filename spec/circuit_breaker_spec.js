@@ -23,7 +23,8 @@ describe('CircuitBreaker', function() {
 
       breaker.run(command);
 
-      expect(breaker._successCount).toBe(1);
+      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      expect(bucket.successes).toBe(1);
     });
 
     it('should be able to notify the breaker if the command failed', function() {
@@ -33,7 +34,8 @@ describe('CircuitBreaker', function() {
 
       breaker.run(command);
 
-      expect(breaker._failCount).toBe(1);
+      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      expect(bucket.failures).toBe(1);
     });
   });
 
@@ -95,9 +97,23 @@ describe('CircuitBreaker', function() {
       breaker.failed();
       breaker.success();
 
-      jasmine.Clock.tick(10001);
+      jasmine.Clock.tick(11001);
 
       expect(breaker.isBroken()).toBe(false);
+    });
+
+    it('should include errors within of the current time window', function() {
+      breaker.threshold = 75;
+
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.failed();
+      breaker.success();
+
+      jasmine.Clock.tick(1001);
+
+      expect(breaker.isBroken()).toBe(true);
     });
   });
 });
