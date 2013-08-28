@@ -1,8 +1,9 @@
-var CircuitBreaker = function() {
+var CircuitBreaker = function(opts) {
+  var opts = opts || {};
+  this.threshold = opts.threshold || 15;
+  this.duration = opts.duration || 10000;
+  this.numOfBuckets = opts.numOfBuckets || 10;
   this._buckets = [{ failures: 0, successes: 0 }];
-  this.threshold = 15;
-  this.rollingWindow = 10000;
-  this.numOfBuckets = 10;
 
   var self = this;
 
@@ -19,12 +20,12 @@ var CircuitBreaker = function() {
   this._ticker = window.setInterval(function() {
     var bucket = { failures: 0, successes: 0 };
 
-    if (self._buckets.length > 10) {
+    if (self._buckets.length > self.numOfBuckets) {
       self._buckets.shift();
     }
 
     self._buckets.push(bucket);
-  }, this.rollingWindow / this.numOfBuckets);
+  }, this.duration / this.numOfBuckets);
 };
 
 CircuitBreaker.prototype.run = function(command) {
