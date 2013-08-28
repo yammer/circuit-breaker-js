@@ -1,18 +1,23 @@
 var CircuitBreaker = function() {
   this._successCount = 0;
   this._failCount = 0;
-};
 
-CircuitBreaker.prototype.run = function(command) {
   var self = this;
 
-  var success = function() {
+  this.success = function() {
     self._successCount++;
   };
 
-  var failed = function() {
+  this.failed = function() {
     self._failCount++;
   };
+};
 
-  command(success, failed);
+CircuitBreaker.prototype.run = function(command) {
+  if (this.isBroken()) return;
+
+  command(this.success, this.failed);
+};
+
+CircuitBreaker.prototype.isBroken = function() {
 };

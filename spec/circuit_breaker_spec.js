@@ -35,4 +35,26 @@ describe('CircuitBreaker', function() {
       expect(breaker._failCount).toBe(1);
     });
   });
+
+  describe('with a broken service', function() {
+
+    it('should not run the command', function() {
+      spyOn(breaker, 'isBroken').andReturn(true);
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('isBroken', function() {
+
+    beforeEach(function() {
+      jasmine.Clock.useMock();
+    });
+
+    it('should be false with successful calls', function() {
+    });
+  });
 });
