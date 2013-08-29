@@ -18,6 +18,15 @@ describe('CircuitBreaker', function() {
     breaker.run(command);
   };
 
+  var timeout = function() {
+    var command = function() {};
+    breaker.run(command);
+
+    jasmine.Clock.tick(1000);
+    jasmine.Clock.tick(1000);
+    jasmine.Clock.tick(1000);
+  };
+
   beforeEach(function() {
     jasmine.Clock.useMock();
     breaker = new CircuitBreaker;
@@ -47,12 +56,7 @@ describe('CircuitBreaker', function() {
     });
 
     it('should record a timeout if not a success or failure', function() {
-      var command = function() {};
-      breaker.run(command);
-
-      jasmine.Clock.tick(1000);
-      jasmine.Clock.tick(1000);
-      jasmine.Clock.tick(1000);
+      timeout();
 
       var bucket = breaker._buckets[breaker._buckets.length - 1];
       expect(bucket.timeouts).toBe(1);
