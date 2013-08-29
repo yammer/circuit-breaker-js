@@ -151,7 +151,7 @@ describe('CircuitBreaker', function() {
   describe('isOpen', function() {
 
     it('should be false if errors are below the threshold', function() {
-      breaker.threshold = 75;
+      breaker.errorThreshold = 75;
 
       fail();
       fail();
@@ -162,7 +162,7 @@ describe('CircuitBreaker', function() {
     });
 
     it('should be true if errors are above the threshold', function() {
-      breaker.threshold = 75;
+      breaker.errorThreshold = 75;
 
       fail();
       fail();
@@ -174,8 +174,8 @@ describe('CircuitBreaker', function() {
     });
 
     it('should be true if timeouts are above the threshold', function() {
-      breaker.threshold = 25;
-      breaker.minErrors = 1;
+      breaker.errorThreshold = 25;
+      breaker.volumeThreshold = 1;
 
       timeout();
       timeout();
@@ -212,7 +212,7 @@ describe('CircuitBreaker', function() {
     });
 
     it('should include errors within the current time window', function() {
-      breaker.threshold = 75;
+      breaker.errorThreshold = 75;
 
       fail();
       fail();
@@ -226,8 +226,8 @@ describe('CircuitBreaker', function() {
     });
 
     it('should not be broken without having more than minumum number of errors', function() {
-      breaker.threshold = 25;
-      breaker.minErrors = 1;
+      breaker.errorThreshold = 25;
+      breaker.volumeThreshold = 1;
 
       fail();
 
