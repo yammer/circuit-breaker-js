@@ -192,7 +192,23 @@ describe('CircuitBreaker', function() {
 
       jasmine.Clock.tick(11001);
 
+      fail();
+
       expect(breaker.isOpen()).toBe(true);
+    });
+
+    it('should retry after window has elapsed', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+
+      jasmine.Clock.tick(11001);
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).toHaveBeenCalled();
     });
 
     it('should include errors within the current time window', function() {

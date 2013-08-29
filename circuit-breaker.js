@@ -9,10 +9,18 @@ var CircuitBreaker = function(opts) {
   this._state = 'closed';
 
   var self = this;
+  var count = 0;
 
   this._ticker = window.setInterval(function() {
     if (self._buckets.length > self.numOfBuckets) {
       self._buckets.shift();
+    }
+
+    count++;
+
+    if (count > self.numOfBuckets) {
+      count = 0;
+      self._state = 'half open';
     }
 
     self._buckets.push(self._createBucket());
@@ -92,7 +100,13 @@ CircuitBreaker.prototype._updateState = function() {
 
   var failedPercent = (failures / total) * 100;
 
-  if (failedPercent > this.threshold && failures > this.minErrors) {
+  if (this._state == 'half open' && this._lastBucket().successes && failures == 0) {
+    this._state = 'closed';
+  }
+  else if (this._state == 'half open' && !this._lastBucket().successes && failures > 0) {
+    this._state = 'open';
+  }
+  else if (failedPercent > this.threshold && failures > this.minErrors) {
     this._state = 'open';
   }
   else {
