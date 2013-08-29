@@ -6,6 +6,7 @@ var CircuitBreaker = function(opts) {
   this.numOfBuckets = opts.numOfBuckets || 10;
   this.timeout = opts.timeout || 3000;
   this._buckets = [this._createBucket()];
+  this._state = 'closed';
 
   var self = this;
 
@@ -18,6 +19,10 @@ var CircuitBreaker = function(opts) {
   }, this.duration / this.numOfBuckets);
 };
 
+CircuitBreaker.prototype.isOpen = function() {
+  return this._state == 'open';
+};
+
 CircuitBreaker.prototype._createBucket = function() {
   return { failures: 0, successes: 0, timeouts: 0, shortCircuits: 0 };
 };
@@ -27,7 +32,7 @@ CircuitBreaker.prototype._lastBucket = function() {
 };
 
 CircuitBreaker.prototype.run = function(command, fallback) {
-  if (this.isBroken()) {
+  if (this.isOpen()) {
     if (fallback) {
       fallback();
     }
@@ -37,6 +42,8 @@ CircuitBreaker.prototype.run = function(command, fallback) {
 
     return;
   }
+
+  this._checkState();
 
   var self = this;
   var timedOut = false;
@@ -68,7 +75,7 @@ CircuitBreaker.prototype.run = function(command, fallback) {
   command(success, failed);
 };
 
-CircuitBreaker.prototype.isBroken = function() {
+CircuitBreaker.prototype._checkState = function() {
   var failures = 0, total = 0;
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
@@ -84,5 +91,10 @@ CircuitBreaker.prototype.isBroken = function() {
 
   var failedPercent = (failures / total) * 100;
 
-  return failedPercent > this.threshold && failures > this.minErrors;
+  if (failedPercent > this.threshold && failures > this.minErrors) {
+    this._state = 'open';
+  }
+  else {
+    this._state = 'closed';
+  }
 };
