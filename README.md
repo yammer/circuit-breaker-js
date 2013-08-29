@@ -1,46 +1,93 @@
 # circuit-breaker.js
 
-Hystrix-like system for javascript.
+Hystrix-like system for JavaScript.
+
 
 ## Install
 
-  npm install
+```sh
+npm install
+```
+
 
 ## Testing
 
-  grunt test
+```sh
+grunt test
+```
 
 or
 
-  grunt test:browser
+```sh
+grunt test:browser
+```
+
 
 ## Usage
 
 ```js
-  var breaker = new CircuitBreaker;
+var breaker = new CircuitBreaker;
 
-  var command = function(success, failed) {
-    restCall()
-      .done(success)
-      .fail(failed);
-  };
+var command = function(success, failed) {
+  restCall()
+    .done(success)
+    .fail(failed);
+};
 
-  var fallback = function() {
-    alert("Service is down");
-  };
+var fallback = function() {
+  alert("Service is down");
+};
 
-  breaker.run(command, fallback);
+breaker.run(command, fallback);
 ```
 
+
 ## API
+
 
 ### CircuitBreaker([config])
 
 Create a new instance of a circuit breaker. Accepts the following config options:
 
+#### windowDuration
+
+Duration of statistical rolling window in milliseconds. This is how long metrics are kept for the circuit breaker to use and for publishing.
+
+The window is broken into buckets and "roll" by those increments.
+
+*Default Value:* 10000
+
+#### numBuckets
+
+Number of buckets the rolling statistical window is broken into.
+
+*Default Value:* 10
+
+#### timeoutDuration
+
+Time in milliseconds after which a command will timeout.
+
+*Default Value:* 3000
+
+#### errorThreshold
+
+Error percentage at which the circuit should trip open and start short-circuiting requests to fallback logic.
+
+*Default Value:* 50
+
+#### volumeThreshold
+
+Minimum number of requests in rolling window needed before tripping the circuit will occur.
+
+For example, if the value is 20, then if only 19 requests are received in the rolling window (say 10 seconds) the circuit will not trip open even if all 19 failed.
+
+*Default Value:* 5
+
+
 ### run(command, [fallback])
 
 Runs a command if circuit is closed, otherwise defaults to a fallback if provided. The command is called with success and failure handlers which you need to call at the appropriate point in your command. For example, if an ajax request succeeds the the success function should be called to notify the breaker. If neither success or failed are called then the command it's assumed the command timed out.
+
 
 ### isOpen
 

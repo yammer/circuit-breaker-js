@@ -1,11 +1,11 @@
 var CircuitBreaker = function(opts) {
   opts = opts || {};
 
-  this.numBuckets      = opts.numBuckets      || 10;    // number
   this.windowDuration  = opts.windowDuration  || 10000; // milliseconds
+  this.numBuckets      = opts.numBuckets      || 10;    // number
   this.timeoutDuration = opts.timeoutDuration || 3000;  // milliseconds
   this.errorThreshold  = opts.errorThreshold  || 50;    // percentage
-  this.volumeThreshold = opts.volumeThreshold || 3;     // number
+  this.volumeThreshold = opts.volumeThreshold || 5;     // number
 
   this._buckets = [this._createBucket()];
   this._state = 'closed';

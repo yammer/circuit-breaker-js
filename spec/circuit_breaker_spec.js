@@ -168,6 +168,7 @@ describe('CircuitBreaker', function() {
       fail();
       fail();
       fail();
+      fail();
       success();
 
       expect(breaker.isOpen()).toBe(true);
@@ -214,6 +215,7 @@ describe('CircuitBreaker', function() {
     it('should include errors within the current time window', function() {
       breaker.errorThreshold = 75;
 
+      fail();
       fail();
       fail();
       fail();
