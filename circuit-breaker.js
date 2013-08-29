@@ -43,8 +43,6 @@ CircuitBreaker.prototype.run = function(command, fallback) {
     return;
   }
 
-  this._checkState();
-
   var self = this;
   var timedOut = false;
 
@@ -52,6 +50,7 @@ CircuitBreaker.prototype.run = function(command, fallback) {
     var bucket = self._lastBucket();
     bucket.timeouts++;
     timedOut = true;
+    self._updateState();
   }, this.timeout);
 
   var success = function() {
@@ -61,6 +60,7 @@ CircuitBreaker.prototype.run = function(command, fallback) {
     bucket.successes++;
 
     window.clearTimeout(timeout);
+    self._updateState();
   };
 
   var failed = function() {
@@ -70,12 +70,13 @@ CircuitBreaker.prototype.run = function(command, fallback) {
     bucket.failures++;
 
     window.clearTimeout(timeout);
+    self._updateState();
   };
 
   command(success, failed);
 };
 
-CircuitBreaker.prototype._checkState = function() {
+CircuitBreaker.prototype._updateState = function() {
   var failures = 0, total = 0;
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
