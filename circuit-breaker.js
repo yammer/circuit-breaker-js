@@ -42,6 +42,8 @@ CircuitBreaker.prototype.run = function(command) {
   };
 
   var failed = function() {
+    if (timedOut) return;
+
     var bucket = self._buckets[self._buckets.length - 1];
     bucket.failures++;
 

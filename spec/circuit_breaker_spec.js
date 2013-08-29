@@ -98,6 +98,21 @@ describe('CircuitBreaker', function() {
       var bucket = breaker._buckets[breaker._buckets.length - 1];
       expect(bucket.successes).toBe(0);
     });
+
+    it('should not record a failure when there is a timeout', function() {
+      var command = function(success, fail) {
+        jasmine.Clock.tick(1000);
+        jasmine.Clock.tick(1000);
+        jasmine.Clock.tick(1000);
+
+        fail();
+      };
+
+      breaker.run(command);
+
+      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      expect(bucket.failures).toBe(0);
+    });
   });
 
   describe('with a broken service', function() {
