@@ -173,6 +173,17 @@ describe('CircuitBreaker', function() {
       expect(breaker.isBroken()).toBe(true);
     });
 
+    it('should be true if timeouts are above the threshold', function() {
+      breaker.threshold = 25;
+      breaker.minErrors = 1;
+
+      timeout();
+      timeout();
+      success();
+
+      expect(breaker.isBroken()).toBe(true);
+    });
+
     it('should ignore errors outside of the current time window', function() {
       breaker.threshold = 75;
 

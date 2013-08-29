@@ -69,19 +69,21 @@ CircuitBreaker.prototype.run = function(command, fallback) {
 };
 
 CircuitBreaker.prototype.isBroken = function() {
-  var failures = 0, successes = 0;
+  var failures = 0, successes = 0,
+      timeouts = 0;
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
     var bucket = this._buckets[i];
 
     failures += bucket.failures;
     successes += bucket.successes;
+    timeouts += bucket.timeouts;
   }
 
-  var total = failures + successes;
+  var total = failures + successes + timeouts;
   if (total == 0) total = 1;
 
-  var failedPercent = (failures / total) * 100;
+  var failedPercent = ((failures + timeouts) / total) * 100;
 
-  return failedPercent > this.threshold && failures > this.minErrors;
+  return failedPercent > this.threshold && (failures + timeouts) > this.minErrors;
 };
