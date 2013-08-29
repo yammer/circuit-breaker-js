@@ -54,26 +54,29 @@ describe('CircuitBreaker', function() {
 
   describe('isBroken', function() {
 
-    it('should be false with successful calls', function() {
-      breaker.success();
+    var success = function() {
+      var command = function(success) {
+        success();
+      };
 
-      expect(breaker.isBroken()).toBe(false);
-    });
+      breaker.run(command);
+    };
 
-    it('should be true with failed calls', function() {
-      breaker.minErrors = 0;
-      breaker.failed();
+    var fail = function() {
+      var command = function(success, failed) {
+        failed();
+      };
 
-      expect(breaker.isBroken()).toBe(true);
-    });
+      breaker.run(command);
+    };
 
     it('should be false if errors are below the threshold', function() {
       breaker.threshold = 75;
 
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.success();
+      fail();
+      fail();
+      fail();
+      success();
 
       expect(breaker.isBroken()).toBe(false);
     });
@@ -81,11 +84,11 @@ describe('CircuitBreaker', function() {
     it('should be true if errors are above the threshold', function() {
       breaker.threshold = 75;
 
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.success();
+      fail();
+      fail();
+      fail();
+      fail();
+      success();
 
       expect(breaker.isBroken()).toBe(true);
     });
@@ -93,11 +96,11 @@ describe('CircuitBreaker', function() {
     it('should ignore errors outside of the current time window', function() {
       breaker.threshold = 75;
 
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.success();
+      fail();
+      fail();
+      fail();
+      fail();
+      success();
 
       jasmine.Clock.tick(11001);
 
@@ -107,11 +110,11 @@ describe('CircuitBreaker', function() {
     it('should include errors within of the current time window', function() {
       breaker.threshold = 75;
 
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.success();
+      fail();
+      fail();
+      fail();
+      fail();
+      success();
 
       jasmine.Clock.tick(1001);
 
@@ -122,7 +125,7 @@ describe('CircuitBreaker', function() {
       breaker.threshold = 25;
       breaker.minErrors = 1;
 
-      breaker.failed();
+      fail();
 
       expect(breaker.isBroken()).toBe(false);
     });

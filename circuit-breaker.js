@@ -9,16 +9,6 @@ var CircuitBreaker = function(opts) {
 
   var self = this;
 
-  this.success = function() {
-    var bucket = self._buckets[self._buckets.length - 1];
-    bucket.successes++;
-  };
-
-  this.failed = function() {
-    var bucket = self._buckets[self._buckets.length - 1];
-    bucket.failures++;
-  };
-
   this._ticker = window.setInterval(function() {
     var bucket = { failures: 0, successes: 0 };
 
@@ -33,7 +23,19 @@ var CircuitBreaker = function(opts) {
 CircuitBreaker.prototype.run = function(command) {
   if (this.isBroken()) return;
 
-  command(this.success, this.failed);
+  var self = this;
+
+  var success = function() {
+    var bucket = self._buckets[self._buckets.length - 1];
+    bucket.successes++;
+  };
+
+  var failed = function() {
+    var bucket = self._buckets[self._buckets.length - 1];
+    bucket.failures++;
+  };
+
+  command(success, failed);
 };
 
 CircuitBreaker.prototype.isBroken = function() {
