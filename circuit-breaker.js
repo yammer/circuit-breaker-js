@@ -27,6 +27,9 @@ CircuitBreaker.prototype.run = function(command, fallback) {
     if (fallback) {
       fallback();
     }
+    
+    var bucket = this._buckets[this._buckets.length - 1];
+    bucket.shortCircuits++;
 
     return;
   }

@@ -136,6 +136,16 @@ describe('CircuitBreaker', function() {
 
       expect(fallback).toHaveBeenCalled();
     });
+
+    it('should record a short circuit', function() {
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+
+      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      expect(bucket.shortCircuits).toBe(1);
+    });
   });
 
   describe('isBroken', function() {
