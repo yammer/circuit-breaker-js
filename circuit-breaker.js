@@ -20,8 +20,14 @@ var CircuitBreaker = function(opts) {
   }, this.duration / this.numOfBuckets);
 };
 
-CircuitBreaker.prototype.run = function(command) {
-  if (this.isBroken()) return;
+CircuitBreaker.prototype.run = function(command, fallback) {
+  if (this.isBroken()) {
+    if (fallback) {
+      fallback();
+    }
+
+    return;
+  }
 
   var self = this;
   var timedOut = false;

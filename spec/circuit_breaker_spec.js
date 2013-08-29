@@ -117,13 +117,24 @@ describe('CircuitBreaker', function() {
 
   describe('with a broken service', function() {
 
-    it('should not run the command', function() {
+    beforeEach(function() {
       spyOn(breaker, 'isBroken').andReturn(true);
+    });
 
+    it('should not run the command', function() {
       var command = jasmine.createSpy();
       breaker.run(command);
 
       expect(command).not.toHaveBeenCalled();
+    });
+
+    it('should run the fallback if one is provided', function() {
+      var command = jasmine.createSpy();
+      var fallback = jasmine.createSpy();
+
+      breaker.run(command, fallback);
+
+      expect(fallback).toHaveBeenCalled();
     });
   });
 
