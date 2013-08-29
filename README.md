@@ -4,15 +4,15 @@ Hystrix-like system for javascript.
 
 ## Install
 
-  npm install
+    npm install
 
 ## Testing
 
-  grunt test
+    grunt test
 
 or
 
-  grunt test:browser
+    grunt test:browser
 
 ## Usage
 
