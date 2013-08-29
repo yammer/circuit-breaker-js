@@ -33,11 +33,15 @@ CircuitBreaker.prototype.run = function(command) {
   var success = function() {
     var bucket = self._buckets[self._buckets.length - 1];
     bucket.successes++;
+
+    window.clearTimeout(timeout);
   };
 
   var failed = function() {
     var bucket = self._buckets[self._buckets.length - 1];
     bucket.failures++;
+
+    window.clearTimeout(timeout);
   };
 
   command(success, failed);
