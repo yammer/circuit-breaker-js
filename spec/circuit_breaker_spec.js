@@ -73,7 +73,7 @@ describe('CircuitBreaker', function() {
       expect(bucket.timeouts).toBe(0);
     });
 
-    it('should not call timeout if there is a success', function() {
+    it('should not call timeout if there is a failure', function() {
       fail();
 
       jasmine.Clock.tick(1000);
