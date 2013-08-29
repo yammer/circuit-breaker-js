@@ -118,7 +118,7 @@ describe('CircuitBreaker', function() {
   describe('with a broken service', function() {
 
     beforeEach(function() {
-      spyOn(breaker, 'isBroken').andReturn(true);
+      spyOn(breaker, 'isOpen').andReturn(true);
     });
 
     it('should not run the command', function() {
@@ -148,7 +148,7 @@ describe('CircuitBreaker', function() {
     });
   });
 
-  describe('isBroken', function() {
+  describe('isOpen', function() {
 
     it('should be false if errors are below the threshold', function() {
       breaker.threshold = 75;
@@ -158,7 +158,7 @@ describe('CircuitBreaker', function() {
       fail();
       success();
 
-      expect(breaker.isBroken()).toBe(false);
+      expect(breaker.isOpen()).toBe(false);
     });
 
     it('should be true if errors are above the threshold', function() {
@@ -170,7 +170,7 @@ describe('CircuitBreaker', function() {
       fail();
       success();
 
-      expect(breaker.isBroken()).toBe(true);
+      expect(breaker.isOpen()).toBe(true);
     });
 
     it('should be true if timeouts are above the threshold', function() {
@@ -181,24 +181,21 @@ describe('CircuitBreaker', function() {
       timeout();
       success();
 
-      expect(breaker.isBroken()).toBe(true);
+      expect(breaker.isOpen()).toBe(true);
     });
 
-    it('should ignore errors outside of the current time window', function() {
-      breaker.threshold = 75;
-
+    it('should maintain failed state after window has passed', function() {
       fail();
       fail();
       fail();
       fail();
-      success();
 
       jasmine.Clock.tick(11001);
 
-      expect(breaker.isBroken()).toBe(false);
+      expect(breaker.isOpen()).toBe(true);
     });
 
-    it('should include errors within of the current time window', function() {
+    it('should include errors within the current time window', function() {
       breaker.threshold = 75;
 
       fail();
@@ -209,7 +206,7 @@ describe('CircuitBreaker', function() {
 
       jasmine.Clock.tick(1001);
 
-      expect(breaker.isBroken()).toBe(true);
+      expect(breaker.isOpen()).toBe(true);
     });
 
     it('should not be broken without having more than minumum number of errors', function() {
@@ -218,7 +215,7 @@ describe('CircuitBreaker', function() {
 
       fail();
 
-      expect(breaker.isBroken()).toBe(false);
+      expect(breaker.isOpen()).toBe(false);
     });
   });
 });
