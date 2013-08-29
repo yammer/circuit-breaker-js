@@ -9,7 +9,7 @@ describe('CircuitBreaker', function() {
   });
 
   describe('with a working service', function() {
-    
+
     it('should run the command', function() {
       var command = jasmine.createSpy();
       breaker.run(command);
@@ -119,7 +119,7 @@ describe('CircuitBreaker', function() {
     });
 
     it('should not be broken without having more than minumum number of errors', function() {
-      breaker.threshold = 25; 
+      breaker.threshold = 25;
       breaker.minErrors = 1;
 
       breaker.failed();
@@ -127,18 +127,42 @@ describe('CircuitBreaker', function() {
       expect(breaker.isBroken()).toBe(false);
     });
 
-    it('should let random request through to test health of the service', function() {
-      breaker.threshold = 25;
+    describe('when Math.random returns a value under the retry probability', function () {
 
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.failed();
-      breaker.success();
+      beforeEach(function () {
+        Math.random.andReturn(0.89);
+      });
 
-      Math.random.andReturn(0.05);
+      it('should let a random request through to test health of the service', function() {
+        breaker.threshold = 25;
 
-      expect(breaker.isBroken()).toBe(false);
+        breaker.failed();
+        breaker.failed();
+        breaker.failed();
+        breaker.failed();
+        breaker.success();
+
+        expect(breaker.isBroken()).toBe(false);
+      });
+    });
+
+    describe('when Math.random returns a value over the retry probability', function () {
+
+      beforeEach(function () {
+        Math.random.andReturn(0.91);
+      });
+
+      it('should not let a random request through to test health of the service', function() {
+        breaker.threshold = 25;
+
+        breaker.failed();
+        breaker.failed();
+        breaker.failed();
+        breaker.failed();
+        breaker.success();
+
+        expect(breaker.isBroken()).toBe(true);
+      });
     });
   });
 });
