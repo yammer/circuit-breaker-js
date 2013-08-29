@@ -16,8 +16,7 @@ module.exports = function(grunt) {
           'circuit-breaker.js'
         ],
         options: {
-          specs:   'spec/**/*.js',
-          helpers: 'vendor/**/*.js'
+          specs:   'spec/**/*.js'
         }
       }
     }
