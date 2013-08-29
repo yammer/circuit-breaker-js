@@ -51,14 +51,14 @@ describe('CircuitBreaker', function() {
     it('should be able to notify the breaker if the command failed', function() {
       fail();
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.failures).toBe(1);
     });
 
     it('should record a timeout if not a success or failure', function() {
       timeout();
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.timeouts).toBe(1);
     });
 
@@ -69,7 +69,7 @@ describe('CircuitBreaker', function() {
       jasmine.Clock.tick(1000);
       jasmine.Clock.tick(1000);
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.timeouts).toBe(0);
     });
 
@@ -80,7 +80,7 @@ describe('CircuitBreaker', function() {
       jasmine.Clock.tick(1000);
       jasmine.Clock.tick(1000);
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.timeouts).toBe(0);
     });
 
@@ -95,7 +95,7 @@ describe('CircuitBreaker', function() {
 
       breaker.run(command);
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.successes).toBe(0);
     });
 
@@ -110,7 +110,7 @@ describe('CircuitBreaker', function() {
 
       breaker.run(command);
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.failures).toBe(0);
     });
   });
@@ -143,7 +143,7 @@ describe('CircuitBreaker', function() {
 
       expect(command).not.toHaveBeenCalled();
 
-      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      var bucket = breaker._lastBucket();
       expect(bucket.shortCircuits).toBe(1);
     });
   });
