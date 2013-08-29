@@ -5,19 +5,21 @@ var CircuitBreaker = function(opts) {
   this.duration = opts.duration || 10000;
   this.numOfBuckets = opts.numOfBuckets || 10;
   this.timeout = opts.timeout || 3000;
-  this._buckets = [{ failures: 0, successes: 0, timeouts: 0 }];
+  this._buckets = [this._createBucket()];
 
   var self = this;
 
   this._ticker = window.setInterval(function() {
-    var bucket = { failures: 0, successes: 0, timeouts: 0 };
-
     if (self._buckets.length > self.numOfBuckets) {
       self._buckets.shift();
     }
 
-    self._buckets.push(bucket);
+    self._buckets.push(self._createBucket());
   }, this.duration / this.numOfBuckets);
+};
+
+CircuitBreaker.prototype._createBucket = function() {
+  return { failures: 0, successes: 0, timeouts: 0, shortCircuits: 0 };
 };
 
 CircuitBreaker.prototype.run = function(command, fallback) {
