@@ -2,8 +2,23 @@ describe('CircuitBreaker', function() {
 
   var breaker;
 
+  var success = function() {
+    var command = function(success) {
+      success();
+    };
+
+    breaker.run(command);
+  };
+
+  var fail = function() {
+    var command = function(success, failed) {
+      failed();
+    };
+
+    breaker.run(command);
+  };
+
   beforeEach(function() {
-    spyOn(Math, 'random').andReturn(1);
     jasmine.Clock.useMock();
     breaker = new CircuitBreaker;
   });
@@ -18,25 +33,29 @@ describe('CircuitBreaker', function() {
     });
 
     it('should be able to notify the breaker if the command was successful', function() {
-      var command = function(success) {
-        success();
-      };
-
-      breaker.run(command);
+      success();
 
       var bucket = breaker._buckets[breaker._buckets.length - 1];
       expect(bucket.successes).toBe(1);
     });
 
     it('should be able to notify the breaker if the command failed', function() {
-      var command = function(success, failed) {
-        failed();
-      };
-
-      breaker.run(command);
+      fail();
 
       var bucket = breaker._buckets[breaker._buckets.length - 1];
       expect(bucket.failures).toBe(1);
+    });
+
+    it('should record a timeout if not a success or failure', function() {
+      var command = function() {};
+      breaker.run(command);
+
+      jasmine.Clock.tick(1000);
+      jasmine.Clock.tick(1000);
+      jasmine.Clock.tick(1000);
+
+      var bucket = breaker._buckets[breaker._buckets.length - 1];
+      expect(bucket.timeouts).toBe(1);
     });
   });
 
@@ -53,22 +72,6 @@ describe('CircuitBreaker', function() {
   });
 
   describe('isBroken', function() {
-
-    var success = function() {
-      var command = function(success) {
-        success();
-      };
-
-      breaker.run(command);
-    };
-
-    var fail = function() {
-      var command = function(success, failed) {
-        failed();
-      };
-
-      breaker.run(command);
-    };
 
     it('should be false if errors are below the threshold', function() {
       breaker.threshold = 75;

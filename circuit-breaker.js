@@ -4,13 +4,13 @@ var CircuitBreaker = function(opts) {
   this.minErrors = opts.minErrors || 3;
   this.duration = opts.duration || 10000;
   this.numOfBuckets = opts.numOfBuckets || 10;
-  this.retryRate = opts.retryRate || 0.1;
-  this._buckets = [{ failures: 0, successes: 0 }];
+  this.timeout = opts.timeout || 3000;
+  this._buckets = [{ failures: 0, successes: 0, timeouts: 0 }];
 
   var self = this;
 
   this._ticker = window.setInterval(function() {
-    var bucket = { failures: 0, successes: 0 };
+    var bucket = { failures: 0, successes: 0, timeouts: 0 };
 
     if (self._buckets.length > self.numOfBuckets) {
       self._buckets.shift();
@@ -24,6 +24,11 @@ CircuitBreaker.prototype.run = function(command) {
   if (this.isBroken()) return;
 
   var self = this;
+
+  var timeout = window.setTimeout(function() {
+    var bucket = self._buckets[self._buckets.length - 1];
+    bucket.timeouts++;
+  }, this.timeout);
 
   var success = function() {
     var bucket = self._buckets[self._buckets.length - 1];
