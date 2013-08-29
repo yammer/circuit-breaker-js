@@ -24,13 +24,17 @@ CircuitBreaker.prototype.run = function(command) {
   if (this.isBroken()) return;
 
   var self = this;
+  var timedOut = false;
 
   var timeout = window.setTimeout(function() {
     var bucket = self._buckets[self._buckets.length - 1];
     bucket.timeouts++;
+    timedOut = true;
   }, this.timeout);
 
   var success = function() {
+    if (timedOut) return;
+
     var bucket = self._buckets[self._buckets.length - 1];
     bucket.successes++;
 
