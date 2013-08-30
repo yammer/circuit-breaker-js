@@ -54,42 +54,25 @@ CircuitBreaker.prototype._lastBucket = function() {
 
 CircuitBreaker.prototype._executeCommand = function(command) {
   var self = this;
-  var timedOut = false;
+  var timeout;
 
-  var recordTimeout = function() {
-    var bucket = self._lastBucket();
-    bucket.timeouts++;
-    timedOut = true;
-    self._updateState();
-  };
+  var increment = function(prop) {
+    return function() {
+      if (!timeout) { return; }
 
-  var timeout = window.setTimeout(recordTimeout, this.timeoutDuration);
+      var bucket = self._lastBucket();
+      bucket[prop]++;
 
-  var success = function() {
-    if (timedOut) {
-      return;
+      self._updateState();
+
+      window.clearTimeout(timeout);
+      timeout = null;
     }
-
-    var bucket = self._lastBucket();
-    bucket.successes++;
-
-    window.clearTimeout(timeout);
-    self._updateState();
   };
 
-  var failed = function() {
-    if (timedOut) {
-      return;
-    }
+  timeout = window.setTimeout(increment('timeouts'), this.timeoutDuration);
 
-    var bucket = self._lastBucket();
-    bucket.failures++;
-
-    window.clearTimeout(timeout);
-    self._updateState();
-  };
-
-  command(success, failed);
+  command(increment('successes'), increment('failures'));
 };
 
 CircuitBreaker.prototype._executeFallback = function(fallback) {
