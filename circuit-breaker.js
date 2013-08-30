@@ -118,8 +118,8 @@ CircuitBreaker.prototype._updateState = function() {
   else {
     var overErrorThreshold = metrics.errorPercentage > this.errorThreshold;
     var overVolumeThreshold = metrics.totalCount > this.volumeThreshold;
-    var openCircuit = overVolumeThreshold && overErrorThreshold;
+    var overThreshold = overVolumeThreshold && overErrorThreshold;
 
-    this._state = openCircuit? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
+    this._state = overThreshold? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
   }
 };
