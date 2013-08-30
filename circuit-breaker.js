@@ -91,7 +91,7 @@ CircuitBreaker.prototype.run = function(command, fallback) {
   }
 };
 
-CircuitBreaker.prototype._updateState = function() {
+CircuitBreaker.prototype._calculateMetrics = function() {
   var totalCount = 0, errorCount = 0, errorPercentage = 0;
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
@@ -104,14 +104,20 @@ CircuitBreaker.prototype._updateState = function() {
 
   errorPercentage = (errorCount / (totalCount > 0 ? totalCount : 1)) * 100;
 
+  return { totalCount: totalCount, errorCount: errorCount, errorPercentage: errorPercentage };
+}
+
+CircuitBreaker.prototype._updateState = function() {
+  var metrics = this._calculateMetrics();
+
   if (this._state == CircuitBreaker.HALF_OPEN) {
-    var lastCommandFailed = !this._lastBucket().successes && errorCount > 0;
+    var lastCommandFailed = !this._lastBucket().successes && metrics.errorCount > 0;
 
     this._state = lastCommandFailed?  CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
   }
   else {
-    var overErrorThreshold = errorPercentage > this.errorThreshold;
-    var overVolumeThreshold = totalCount > this.volumeThreshold;
+    var overErrorThreshold = metrics.errorPercentage > this.errorThreshold;
+    var overVolumeThreshold = metrics.totalCount > this.volumeThreshold;
     var openCircuit = overVolumeThreshold && overErrorThreshold;
 
     this._state = openCircuit? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
