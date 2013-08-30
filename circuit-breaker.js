@@ -20,8 +20,9 @@ CircuitBreaker.CLOSED = 2;
 CircuitBreaker.prototype._startTicker = function() {
   var self = this;
   var bucketIndex = 0;
+  var bucketDuration = this.windowDuration / this.numBuckets;
 
-  window.setInterval(function() {
+  var tick = function() {
     if (self._buckets.length > self.numBuckets) {
       self._buckets.shift();
     }
@@ -34,7 +35,9 @@ CircuitBreaker.prototype._startTicker = function() {
     }
 
     self._buckets.push(self._createBucket());
-  }, this.windowDuration / this.numBuckets);
+  };
+
+  window.setInterval(tick, bucketDuration);
 };
 
 CircuitBreaker.prototype.isOpen = function() {
