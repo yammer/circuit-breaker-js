@@ -19,6 +19,33 @@ CircuitBreaker.OPEN = 0;
 CircuitBreaker.HALF_OPEN = 1;
 CircuitBreaker.CLOSED = 2;
 
+// PUBLIC
+
+CircuitBreaker.prototype.run = function(command, fallback) {
+  if (this.isOpen()) {
+    this._executeFallback(fallback || function() {});
+  }
+  else {
+    this._executeCommand(command);
+  }
+};
+
+CircuitBreaker.prototype.forceClose = function() {
+  this._state = CircuitBreaker.CLOSED;
+  this._forced = true;
+};
+
+CircuitBreaker.prototype.forceOpen = function() {
+  this._state = CircuitBreaker.OPEN;
+  this._forced = true;
+};
+
+CircuitBreaker.prototype.isOpen = function() {
+  return this._state == CircuitBreaker.OPEN;
+};
+
+// PRIVATE
+
 CircuitBreaker.prototype._startTicker = function() {
   var self = this;
   var bucketIndex = 0;
@@ -122,29 +149,4 @@ CircuitBreaker.prototype._updateState = function() {
       this.onCircuitOpen();
     }
   }
-};
-
-// PUBLIC
-
-CircuitBreaker.prototype.run = function(command, fallback) {
-  if (this.isOpen()) {
-    this._executeFallback(fallback || function() {});
-  }
-  else {
-    this._executeCommand(command);
-  }
-};
-
-CircuitBreaker.prototype.forceClose = function() {
-  this._state = CircuitBreaker.CLOSED;
-  this._forced = true;
-};
-
-CircuitBreaker.prototype.forceOpen = function() {
-  this._state = CircuitBreaker.OPEN;
-  this._forced = true;
-};
-
-CircuitBreaker.prototype.isOpen = function() {
-  return this._state == CircuitBreaker.OPEN;
 };
