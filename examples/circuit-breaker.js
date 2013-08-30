@@ -63,9 +63,12 @@ CircuitBreaker.prototype._startTicker = function() {
 
     bucketIndex++;
 
-    if (bucketIndex > self.numBuckets && self.isOpen()) {
+    if (bucketIndex > self.numBuckets) {
       bucketIndex = 0;
-      self._state = CircuitBreaker.HALF_OPEN;
+
+      if (self.isOpen()) {
+        self._state = CircuitBreaker.HALF_OPEN;
+      }
     }
 
     self._buckets.push(self._createBucket());
@@ -119,7 +122,7 @@ CircuitBreaker.prototype._calculateMetrics = function() {
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
     var bucket = this._buckets[i];
-    var errors = (bucket.failures + bucket.timeouts + bucket.shortCircuits);
+    var errors = (bucket.failures + bucket.timeouts);
 
     errorCount += errors;
     totalCount += (errors + bucket.successes);

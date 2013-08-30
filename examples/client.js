@@ -5,7 +5,7 @@ var breaker = new CircuitBreaker({
 });
 
 breaker.onCircuitOpen = function() {
-  console.log('threshold reached');
+  console.log('threshold reached', this._state);
 };
 
 var fallback = function() {
@@ -20,8 +20,6 @@ var requestWithFallback = function(url, fallback) {
   };
 
   breaker.run(command, fallback);
-
-  console.log(breaker._state);
 };
 
 $(function() {
