@@ -270,7 +270,7 @@ describe('CircuitBreaker', function() {
     });
   });
 
-  describe('forceClosed', function() {
+  describe('forceClose', function() {
     
     it('should by pass error checks', function() {
       fail();
@@ -287,6 +287,26 @@ describe('CircuitBreaker', function() {
 
       expect(command).toHaveBeenCalled();
       expect(breaker.isOpen()).toBe(false);
+    });
+  });
+
+  describe('forceOpen', function() {
+    
+    it('should always use the fallback', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceOpen();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(true);
     });
   });
 });

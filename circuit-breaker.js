@@ -140,6 +140,11 @@ CircuitBreaker.prototype.forceClose = function() {
   this._forced = true;
 };
 
+CircuitBreaker.prototype.forceOpen = function() {
+  this._state = CircuitBreaker.OPEN;
+  this._forced = true;
+};
+
 CircuitBreaker.prototype.isOpen = function() {
   return this._state == CircuitBreaker.OPEN;
 };
