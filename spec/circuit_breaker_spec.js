@@ -269,4 +269,44 @@ describe('CircuitBreaker', function() {
       expect(closeSpy).toHaveBeenCalled();
     });
   });
+
+  describe('forceClose', function() {
+    
+    it('should by pass error checks', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceClose();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(false);
+    });
+  });
+
+  describe('forceOpen', function() {
+    
+    it('should always use the fallback', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceOpen();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(true);
+    });
+  });
 });
