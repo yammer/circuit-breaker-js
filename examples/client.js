@@ -20,20 +20,24 @@ var requestWithFallback = function(url, fallback) {
   };
 
   breaker.run(command, fallback);
+
+  console.log(breaker._state);
 };
 
-$('.success', function(e) {
-  requestWithFallback('/success', fallback);
-});
+$(function() {
+  $('.success').click(function(e) {
+    requestWithFallback('/success', fallback);
+  });
 
-$('.fail', function(e) {
-  requestWithFallback('/fail', fallback);
-});
+  $('.fail').click(function(e) {
+    requestWithFallback('/fail', fallback);
+  });
 
-$('.timeout', function(e) {
-  requestWithFallback('/timeout', fallback);
-});
+  $('.timeout').click(function(e) {
+    requestWithFallback('/timeout', fallback);
+  });
 
-$('.flaky', function(e) {
-  requestWithFallback('/flaky', fallback);
+  $('.flaky').click(function(e) {
+    requestWithFallback('/flaky', fallback);
+  });
 });
