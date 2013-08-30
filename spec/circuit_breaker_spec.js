@@ -238,20 +238,35 @@ describe('CircuitBreaker', function() {
   });
 
   describe('logging', function() {
-    var spy;
+    var openSpy, closeSpy;
     
     beforeEach(function() {
-      spy = jasmine.createSpy();
+      openSpy = jasmine.createSpy();
+      closeSpy = jasmine.createSpy();
+
+      breaker.volumeThreshold = 1;
+      breaker.onCircuitOpen = openSpy;
+      breaker.onCircuitClose = closeSpy;
     });
 
     it('should call the onCircuitOpen method when a failure is recorded', function() {
-      breaker.volumeThreshold = 1;
-      breaker.onCircuitOpen = spy;
-
       fail();
       fail();
 
-      expect(spy).toHaveBeenCalled();
+      expect(openSpy).toHaveBeenCalled();
+    });
+
+    it('should call the onCircuitClosed method when the break is successfully reset', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+
+      jasmine.Clock.tick(11001);
+
+      success();
+
+      expect(closeSpy).toHaveBeenCalled();
     });
   });
 });

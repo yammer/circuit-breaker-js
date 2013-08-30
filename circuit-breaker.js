@@ -7,6 +7,7 @@ var CircuitBreaker = function(opts) {
   this.errorThreshold  = opts.errorThreshold  || 50;    // percentage
   this.volumeThreshold = opts.volumeThreshold || 5;     // number
   this.onCircuitOpen   = opts.onCircuitOpen   || function() {};
+  this.onCircuitClose   = opts.onCircuitClose || function() {};
 
   this._buckets = [this._createBucket()];
   this._state = CircuitBreaker.CLOSED;
@@ -101,7 +102,13 @@ CircuitBreaker.prototype._updateState = function() {
   if (this._state == CircuitBreaker.HALF_OPEN) {
     var lastCommandFailed = !this._lastBucket().successes && metrics.errorCount > 0;
 
-    this._state = lastCommandFailed?  CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
+    if (lastCommandFailed) {
+      this._state = CircuitBreaker.OPEN;
+    }
+    else {
+      this._state = CircuitBreaker.CLOSED;
+      this.onCircuitClose();
+    }
   }
   else {
     var overErrorThreshold = metrics.errorPercentage > this.errorThreshold;
