@@ -236,4 +236,22 @@ describe('CircuitBreaker', function() {
       expect(breaker.isOpen()).toBe(false);
     });
   });
+
+  describe('logging', function() {
+    var spy;
+    
+    beforeEach(function() {
+      spy = jasmine.createSpy();
+    });
+
+    it('should call the onCircuitOpen method when a failure is recorded', function() {
+      breaker.volumeThreshold = 1;
+      breaker.onCircuitOpen = spy;
+
+      fail();
+      fail();
+
+      expect(spy).toHaveBeenCalled();
+    });
+  });
 });

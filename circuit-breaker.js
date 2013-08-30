@@ -6,6 +6,7 @@ var CircuitBreaker = function(opts) {
   this.timeoutDuration = opts.timeoutDuration || 3000;  // milliseconds
   this.errorThreshold  = opts.errorThreshold  || 50;    // percentage
   this.volumeThreshold = opts.volumeThreshold || 5;     // number
+  this.onCircuitOpen   = opts.onCircuitOpen   || function() {};
 
   this._buckets = [this._createBucket()];
   this._state = CircuitBreaker.CLOSED;
@@ -107,7 +108,13 @@ CircuitBreaker.prototype._updateState = function() {
     var overVolumeThreshold = metrics.totalCount > this.volumeThreshold;
     var overThreshold = overVolumeThreshold && overErrorThreshold;
 
-    this._state = overThreshold? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
+    if (overThreshold) {
+      this._state = CircuitBreaker.OPEN;
+      this.onCircuitOpen();
+    }
+    else {
+      this._state = CircuitBreaker.CLOSED;
+    }
   }
 };
 
