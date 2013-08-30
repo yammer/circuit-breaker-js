@@ -11,17 +11,17 @@ var CircuitBreaker = function(opts) {
   this._state = CircuitBreaker.CLOSED;
 
   var self = this;
-  var count = 0;
+  var bucketIndex = 0;
 
   this._ticker = window.setInterval(function() {
     if (self._buckets.length > self.numBuckets) {
       self._buckets.shift();
     }
 
-    count++;
+    bucketIndex++;
 
-    if (count > self.numBuckets) {
-      count = 0;
+    if (bucketIndex > self.numBuckets) {
+      bucketIndex = 0;
       self._state = CircuitBreaker.HALF_OPEN;
     }
 
