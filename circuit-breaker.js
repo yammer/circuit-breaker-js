@@ -8,7 +8,7 @@ var CircuitBreaker = function(opts) {
   this.volumeThreshold = opts.volumeThreshold || 5;     // number
 
   this._buckets = [this._createBucket()];
-  this._state = 'closed';
+  this._state = CircuitBreaker.CLOSED;
 
   var self = this;
   var count = 0;
@@ -22,15 +22,19 @@ var CircuitBreaker = function(opts) {
 
     if (count > self.numBuckets) {
       count = 0;
-      self._state = 'half open';
+      self._state = CircuitBreaker.HALF_OPEN;
     }
 
     self._buckets.push(self._createBucket());
   }, this.windowDuration / this.numBuckets);
 };
 
+CircuitBreaker.OPEN = 0;
+CircuitBreaker.HALF_OPEN = 1;
+CircuitBreaker.CLOSED = 2;
+
 CircuitBreaker.prototype.isOpen = function() {
-  return this._state == 'open';
+  return this._state == CircuitBreaker.OPEN;
 };
 
 CircuitBreaker.prototype._createBucket = function() {
@@ -104,16 +108,16 @@ CircuitBreaker.prototype._updateState = function() {
 
   errorPercentage = (errorCount / (totalCount > 0 ? totalCount : 1)) * 100;
 
-  if (this._state == 'half open' && this._lastBucket().successes && errorCount == 0) {
-    this._state = 'closed';
+  if (this._state == CircuitBreaker.HALF_OPEN && this._lastBucket().successes && errorCount == 0) {
+    this._state = CircuitBreaker.CLOSED;
   }
-  else if (this._state == 'half open' && !this._lastBucket().successes && errorCount > 0) {
-    this._state = 'open';
+  else if (this._state == CircuitBreaker.HALF_OPEN && !this._lastBucket().successes && errorCount > 0) {
+    this._state = CircuitBreaker.OPEN;
   }
   else if (errorPercentage > this.errorThreshold && totalCount > this.volumeThreshold) {
-    this._state = 'open';
+    this._state = CircuitBreaker.OPEN;
   }
   else {
-    this._state = 'closed';
+    this._state = CircuitBreaker.CLOSED;
   }
 };
