@@ -103,19 +103,3 @@ Runs a command if circuit is closed, otherwise defaults to a fallback if provide
 ### isOpen
 
 Checks whether the breaker is currently accepting requests.
-
-### forceOpen
-
-Forces the circuit to open.
-
-Metrics will not be collected while the circuit is forced.
-
-### forceClose
-
-Forces the circuit to close.
-
-Metrics will not be collected while the circuit is forced.
-
-### unforce
-
-Gets the circuit out of a forced state.
