@@ -112,9 +112,6 @@ CircuitBreaker.prototype._updateState = function() {
       this._state = CircuitBreaker.OPEN;
       this.onCircuitOpen();
     }
-    else {
-      this._state = CircuitBreaker.CLOSED;
-    }
   }
 };
 
