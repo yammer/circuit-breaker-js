@@ -272,7 +272,7 @@ describe('CircuitBreaker', function() {
 
   describe('forceClose', function() {
     
-    it('should by pass error checks', function() {
+    it('should bypass error checks', function() {
       fail();
       fail();
       fail();
@@ -287,6 +287,24 @@ describe('CircuitBreaker', function() {
 
       expect(command).toHaveBeenCalled();
       expect(breaker.isOpen()).toBe(false);
+    });
+    
+    it('should use error thresholds as normal', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceClose();
+      breaker.unforce();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(true);
     });
   });
 

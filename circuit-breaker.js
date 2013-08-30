@@ -31,13 +31,18 @@ CircuitBreaker.prototype.run = function(command, fallback) {
 };
 
 CircuitBreaker.prototype.forceClose = function() {
+  this._forced = this._state;
   this._state = CircuitBreaker.CLOSED;
-  this._forced = true;
 };
 
 CircuitBreaker.prototype.forceOpen = function() {
+  this._forced = this._state;
   this._state = CircuitBreaker.OPEN;
-  this._forced = true;
+};
+
+CircuitBreaker.prototype.unforce = function() {
+  this._state = this._forced;
+  this._forced = false;
 };
 
 CircuitBreaker.prototype.isOpen = function() {
