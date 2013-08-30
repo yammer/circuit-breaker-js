@@ -269,4 +269,24 @@ describe('CircuitBreaker', function() {
       expect(closeSpy).toHaveBeenCalled();
     });
   });
+
+  describe('forceClosed', function() {
+    
+    it('should by pass error checks', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceClosed = true;
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(false);
+    });
+  });
 });

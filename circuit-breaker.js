@@ -125,6 +125,8 @@ CircuitBreaker.prototype._updateState = function() {
 // PUBLIC
 
 CircuitBreaker.prototype.run = function(command, fallback) {
+  if (this.forceClosed) { this._state = CircuitBreaker.CLOSED; }
+
   if (this.isOpen()) {
     this._executeFallback(fallback || function() {});
   }
