@@ -96,8 +96,8 @@ CircuitBreaker.prototype._executeCommand = function(command) {
       var bucket = self._lastBucket();
       bucket[prop]++;
 
-      if (!self._forced) { 
-        self._updateState(); 
+      if (!self._forced) {
+        self._updateState();
       }
 
       window.clearTimeout(timeout);
