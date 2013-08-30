@@ -1,7 +1,7 @@
 var breaker = new CircuitBreaker({
   timeoutDuration: 1000,
   volumeThreshold: 1,
-  errorThreshold: 10
+  errorThreshold: 50
 });
 
 breaker.onCircuitOpen = function() {

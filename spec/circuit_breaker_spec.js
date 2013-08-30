@@ -186,6 +186,9 @@ describe('CircuitBreaker', function() {
     });
 
     it('should maintain failed state after window has passed', function() {
+      breaker.errorThreshold = 25;
+      breaker.volumeThreshold = 1;
+
       fail();
       fail();
       fail();
