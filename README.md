@@ -83,6 +83,17 @@ For example, if the value is 20, then if only 19 requests are received in the ro
 
 *Default Value:* 5
 
+#### onCircuitOpen
+
+Function that is run whenever the circuit is opened (i.e. the threshold is reached).
+
+*Default Value:* no-op
+
+#### onCircuitClose
+
+Function that is run whenever the circuit is closed (i.e. the service is back up).
+
+*Default Value:* no-op
 
 ### run(command, [fallback])
 
