@@ -280,7 +280,7 @@ describe('CircuitBreaker', function() {
       fail();
       fail();
 
-      breaker.forceClosed = true;
+      breaker.forceClose();
 
       var command = jasmine.createSpy();
       breaker.run(command);
