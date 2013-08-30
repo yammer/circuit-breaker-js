@@ -40,10 +40,6 @@ CircuitBreaker.prototype._startTicker = function() {
   window.setInterval(tick, bucketDuration);
 };
 
-CircuitBreaker.prototype.isOpen = function() {
-  return this._state == CircuitBreaker.OPEN;
-};
-
 CircuitBreaker.prototype._createBucket = function() {
   return { failures: 0, successes: 0, timeouts: 0, shortCircuits: 0 };
 };
@@ -82,15 +78,6 @@ CircuitBreaker.prototype._executeFallback = function(fallback) {
   bucket.shortCircuits++;
 };
 
-CircuitBreaker.prototype.run = function(command, fallback) {
-  if (this.isOpen()) {
-    this._executeFallback(fallback || function() {});
-  }
-  else {
-    this._executeCommand(command);
-  }
-};
-
 CircuitBreaker.prototype._calculateMetrics = function() {
   var totalCount = 0, errorCount = 0, errorPercentage = 0;
 
@@ -122,4 +109,19 @@ CircuitBreaker.prototype._updateState = function() {
 
     this._state = overThreshold? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
   }
+};
+
+// PUBLIC
+
+CircuitBreaker.prototype.run = function(command, fallback) {
+  if (this.isOpen()) {
+    this._executeFallback(fallback || function() {});
+  }
+  else {
+    this._executeCommand(command);
+  }
+};
+
+CircuitBreaker.prototype.isOpen = function() {
+  return this._state == CircuitBreaker.OPEN;
 };
