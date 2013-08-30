@@ -96,7 +96,6 @@ CircuitBreaker.prototype._updateState = function() {
 
   for (var i = 0, l = this._buckets.length; i < l; i++) {
     var bucket = this._buckets[i];
-
     var errors = (bucket.failures + bucket.timeouts + bucket.shortCircuits);
 
     errorCount += errors;
@@ -105,16 +104,16 @@ CircuitBreaker.prototype._updateState = function() {
 
   errorPercentage = (errorCount / (totalCount > 0 ? totalCount : 1)) * 100;
 
-  if (this._state == CircuitBreaker.HALF_OPEN && this._lastBucket().successes && errorCount == 0) {
-    this._state = CircuitBreaker.CLOSED;
-  }
-  else if (this._state == CircuitBreaker.HALF_OPEN && !this._lastBucket().successes && errorCount > 0) {
-    this._state = CircuitBreaker.OPEN;
-  }
-  else if (errorPercentage > this.errorThreshold && totalCount > this.volumeThreshold) {
-    this._state = CircuitBreaker.OPEN;
+  if (this._state == CircuitBreaker.HALF_OPEN) {
+    var lastCommandFailed = !this._lastBucket().successes && errorCount > 0;
+
+    this._state = lastCommandFailed?  CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
   }
   else {
-    this._state = CircuitBreaker.CLOSED;
+    var overErrorThreshold = errorPercentage > this.errorThreshold;
+    var overVolumeThreshold = totalCount > this.volumeThreshold;
+    var openCircuit = overVolumeThreshold && overErrorThreshold;
+
+    this._state = openCircuit? CircuitBreaker.OPEN : CircuitBreaker.CLOSED;
   }
 };
