@@ -92,19 +92,20 @@ CircuitBreaker.prototype._executeCommand = function(command) {
   command(success, failed);
 };
 
+CircuitBreaker.prototype._executeFallback = function(fallback) {
+  fallback();
+
+  var bucket = this._lastBucket();
+  bucket.shortCircuits++;
+};
+
 CircuitBreaker.prototype.run = function(command, fallback) {
-  fallback = fallback || function() {};
-
   if (this.isOpen()) {
-    fallback();
-
-    var bucket = this._lastBucket();
-    bucket.shortCircuits++;
-
-    return;
+    this._executeFallback(fallback || function() {});
   }
-
-  this._executeCommand(command);
+  else {
+    this._executeCommand(command);
+  }
 };
 
 CircuitBreaker.prototype._updateState = function() {
