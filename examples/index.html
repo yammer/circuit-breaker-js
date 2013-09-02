@@ -5,6 +5,12 @@
     <title>CircuitBreaker example</title>
 
     <style type="text/css" media="all">
+      body {
+        font-family: sans-serif;
+        background: #3d3d3d;
+        color: #fff;
+      }
+
       .loading {
         display: none;
       }
@@ -15,6 +21,20 @@
 
       .failed {
         display: none;
+      }
+
+      button {
+        background: #308fd9;
+        color: #fff;
+        border: none;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .content {
+        width: 500px;
+        text-align: center;
+        margin-top: 20px;
       }
     </style>
   </head>
@@ -28,7 +48,7 @@
     <button class="unforce">Unforce</button>
 
     <div class="content">
-      <p class="loading"><img src="http://retrofeasts.com/wp-content/themes/dry-wp/images/ajax-document-loader.gif"></p>
+      <p class="loading">Loading...</p>
       <p class="successful">Content loaded</p>
       <p class="failed">Service isn't available</p>
     </div>
