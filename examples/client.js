@@ -12,27 +12,34 @@ breaker.onCircuitClose = function() {
   console.warn("Circuit close", this._state);
 };
 
-var fallback = function() {
+var showLoadingGif = function() {
+  $('.content p').hide();
+  $('.loading').show();
+};
+
+var showSuccessMessage = function() {
+  $('.content p').hide();
+  $('.successful').show();
+};
+
+var showFailureMessage = function() {
   $('.content p').hide();
   $('.failed').show();
 };
 
+var fallback = showFailureMessage;
+
 var requestWithFallback = function(url, fallback) {
-  $('.content p').hide();
-  $('.loading').show();
+  showLoadingGif();
 
   var command = function(success, failure) {
     $.ajax({ url: url })
       .done(function () {
-        $('.loading').hide();
-        $('.successful').show();
-
+        showSuccessMessage();
         success();
       })
       .fail(function() {
-        $('.loading').hide();
-        $('.failed').show();
-
+        showFailureMessage();
         failure();
       });
   };
