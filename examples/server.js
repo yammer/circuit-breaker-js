@@ -15,7 +15,7 @@ app.get('/fail', function(req, res) {
 app.get('/timeout', function(req, res) {
   setTimeout(function() {
     res.end("Timed out");
-  }, 10000);
+  }, 5000);
 });
 
 app.get('/flaky', function(req, res) {

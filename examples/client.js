@@ -12,7 +12,7 @@ breaker.onCircuitClose = function() {
   console.warn("Circuit close", this._state);
 };
 
-var showLoadingGif = function() {
+var showLoading = function() {
   $('.content p').hide();
   $('.loading').show();
 };
@@ -30,7 +30,7 @@ var showFailureMessage = function() {
 var fallback = showFailureMessage;
 
 var requestWithFallback = function(url, fallback) {
-  showLoadingGif();
+  showLoading();
 
   var command = function(success, failure) {
     $.ajax({ url: url })
