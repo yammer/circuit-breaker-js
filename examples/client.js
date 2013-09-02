@@ -5,11 +5,15 @@ var breaker = new CircuitBreaker({
 });
 
 breaker.onCircuitOpen = function() {
-  console.log('threshold reached', this._state);
+  console.warn("Circuit open", this._state);
+};
+
+breaker.onCircuitClose = function() {
+  console.warn("Circuit close", this._state);
 };
 
 var fallback = function() {
-  alert("Service is down");
+  console.error("Service is down");
 };
 
 var requestWithFallback = function(url, fallback) {
@@ -37,5 +41,17 @@ $(function() {
 
   $('.flaky').click(function(e) {
     requestWithFallback('/flaky', fallback);
+  });
+
+  $('.open').click(function(e) {
+    breaker.forceOpen();
+  });
+
+  $('.close').click(function(e) {
+    breaker.forceClose();
+  });
+
+  $('.unforce').click(function(e) {
+    breaker.unforce();
   });
 });
