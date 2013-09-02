@@ -6,8 +6,9 @@ var CircuitBreaker = function(opts) {
   this.timeoutDuration = opts.timeoutDuration || 3000;  // milliseconds
   this.errorThreshold  = opts.errorThreshold  || 50;    // percentage
   this.volumeThreshold = opts.volumeThreshold || 5;     // number
+
   this.onCircuitOpen   = opts.onCircuitOpen   || function() {};
-  this.onCircuitClose   = opts.onCircuitClose || function() {};
+  this.onCircuitClose  = opts.onCircuitClose  || function() {};
 
   this._buckets = [this._createBucket()];
   this._state = CircuitBreaker.CLOSED;
