@@ -161,7 +161,7 @@
   };
 
   var assign = function(name, obj) {
-    var commonJS = module && module.exports;
+    var commonJS = typeof module != "undefined" && module.exports;
 
     if (commonJS) {
       module.exports = obj;
