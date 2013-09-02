@@ -1,6 +1,6 @@
 # circuit-breaker.js
 
-Hystrix-like system for JavaScript.
+[Hystrix](https://github.com/Netflix/Hystrix)-like circuit breaker for JavaScript.
 
 
 ## Install
