@@ -242,7 +242,7 @@ describe('CircuitBreaker', function() {
 
   describe('logging', function() {
     var openSpy, closeSpy;
-    
+
     beforeEach(function() {
       openSpy = jasmine.createSpy();
       closeSpy = jasmine.createSpy();
@@ -274,8 +274,8 @@ describe('CircuitBreaker', function() {
   });
 
   describe('forceClose', function() {
-    
-    it('should bypass error checks', function() {
+
+    it('should bypass threshold checks', function() {
       fail();
       fail();
       fail();
@@ -291,8 +291,75 @@ describe('CircuitBreaker', function() {
       expect(command).toHaveBeenCalled();
       expect(breaker.isOpen()).toBe(false);
     });
-    
-    it('should use error thresholds as normal', function() {
+
+    it('should not collect stats', function() {
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      breaker.forceClose();
+      success();
+      success();
+      success();
+      success();
+      success();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(false);
+    });
+  });
+
+  describe('forceOpen', function() {
+
+    it('should bypass threshold checks', function() {
+      success();
+      success();
+      success();
+      success();
+      success();
+      success();
+
+      breaker.forceOpen();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(true);
+    });
+
+    it('should not collect stats', function() {
+      success();
+      success();
+      success();
+      success();
+      success();
+      success();
+
+      breaker.forceOpen();
+      fail();
+      fail();
+      fail();
+      fail();
+      fail();
+
+      var command = jasmine.createSpy();
+      breaker.run(command);
+
+      expect(command).not.toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(true);
+    });
+  });
+
+  describe('unforce', function () {
+
+    it('should recover from a force-closed circuit', function() {
       fail();
       fail();
       fail();
@@ -309,25 +376,24 @@ describe('CircuitBreaker', function() {
       expect(command).not.toHaveBeenCalled();
       expect(breaker.isOpen()).toBe(true);
     });
-  });
 
-  describe('forceOpen', function() {
-    
-    it('should always use the fallback', function() {
-      fail();
-      fail();
-      fail();
-      fail();
-      fail();
-      fail();
+    it('should recover from a force-open circuit', function() {
+      success();
+      success();
+      success();
+      success();
+      success();
+      success();
 
       breaker.forceOpen();
+      breaker.unforce();
 
       var command = jasmine.createSpy();
       breaker.run(command);
 
-      expect(command).not.toHaveBeenCalled();
-      expect(breaker.isOpen()).toBe(true);
+      expect(command).toHaveBeenCalled();
+      expect(breaker.isOpen()).toBe(false);
     });
+
   });
 });
