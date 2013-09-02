@@ -3,26 +3,6 @@
 [Hystrix](https://github.com/Netflix/Hystrix)-like circuit breaker for JavaScript.
 
 
-## Install
-
-```sh
-npm install
-```
-
-
-## Testing
-
-```sh
-grunt test
-```
-
-or
-
-```sh
-grunt test:browser
-```
-
-
 ## Usage
 
 ```js
@@ -119,3 +99,24 @@ Metrics will not be collected while the circuit is forced.
 ### unforce
 
 Returns the circuit to its last unforced state.
+
+
+## Contributing
+
+Install the dependencies
+
+```sh
+npm install
+```
+
+Run the tests with:
+
+```sh
+grunt test
+```
+
+or
+
+```sh
+grunt test:browser
+```
