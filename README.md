@@ -118,4 +118,4 @@ Metrics will not be collected while the circuit is forced.
 
 ### unforce
 
-Gets the circuit out of a forced state.
+Returns the circuit to its last unforced state.
