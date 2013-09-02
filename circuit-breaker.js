@@ -7,8 +7,9 @@
     this.timeoutDuration = opts.timeoutDuration || 3000;  // milliseconds
     this.errorThreshold  = opts.errorThreshold  || 50;    // percentage
     this.volumeThreshold = opts.volumeThreshold || 5;     // number
+
     this.onCircuitOpen   = opts.onCircuitOpen   || function() {};
-    this.onCircuitClose   = opts.onCircuitClose || function() {};
+    this.onCircuitClose  = opts.onCircuitClose  || function() {};
 
     this._buckets = [this._createBucket()];
     this._state = CircuitBreaker.CLOSED;
@@ -43,7 +44,7 @@
 
   CircuitBreaker.prototype.unforce = function() {
     this._state = this._forced;
-    this._forced = false;
+    this._forced = null;
   };
 
   CircuitBreaker.prototype.isOpen = function() {
@@ -97,7 +98,7 @@
         var bucket = self._lastBucket();
         bucket[prop]++;
 
-        if (!self._forced) { 
+        if (self._forced == null) { 
           self._updateState(); 
         }
 
