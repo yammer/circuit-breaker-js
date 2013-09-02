@@ -13,14 +13,28 @@ breaker.onCircuitClose = function() {
 };
 
 var fallback = function() {
-  console.error("Service is down");
+  $('.content p').hide();
+  $('.failed').show();
 };
 
 var requestWithFallback = function(url, fallback) {
+  $('.content p').hide();
+  $('.loading').show();
+
   var command = function(success, failure) {
     $.ajax({ url: url })
-      .done(success)
-      .fail(failure);
+      .done(function () {
+        $('.loading').hide();
+        $('.successful').show();
+
+        success();
+      })
+      .fail(function() {
+        $('.loading').hide();
+        $('.failed').show();
+
+        failure();
+      });
   };
 
   breaker.run(command, fallback);

@@ -19,7 +19,7 @@ app.get('/timeout', function(req, res) {
 });
 
 app.get('/flaky', function(req, res) {
-  if (Math.random() > 0.75) {
+  if (Math.random() > 0.5) {
     res.status(500);
   }
 
