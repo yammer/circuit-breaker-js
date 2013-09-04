@@ -1,4 +1,4 @@
-# CircuitBreaker
+# CircuitBreaker [![Build Status](https://travis-ci.org/yammer/circuit-breaker-js.png)](https://travis-ci.org/yammer/circuit-breaker-js)
 
 [Hystrix](https://github.com/Netflix/Hystrix)-like circuit breaker for JavaScript.
 
