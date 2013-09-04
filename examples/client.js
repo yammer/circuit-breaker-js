@@ -4,12 +4,12 @@ var breaker = new CircuitBreaker({
   errorThreshold: 50
 });
 
-breaker.onCircuitOpen = function() {
-  console.warn("Circuit open", this._state);
+breaker.onCircuitOpen = function(metrics) {
+  console.warn('Circuit open', metrics);
 };
 
-breaker.onCircuitClose = function() {
-  console.warn("Circuit close", this._state);
+breaker.onCircuitClose = function(metrics) {
+  console.warn('Circuit close', metrics);
 };
 
 var showLoading = function() {
@@ -48,31 +48,31 @@ var requestWithFallback = function(url, fallback) {
 };
 
 $(function() {
-  $('.success').click(function(e) {
+  $('.success').click(function() {
     requestWithFallback('/success', fallback);
   });
 
-  $('.fail').click(function(e) {
+  $('.fail').click(function() {
     requestWithFallback('/fail', fallback);
   });
 
-  $('.timeout').click(function(e) {
+  $('.timeout').click(function() {
     requestWithFallback('/timeout', fallback);
   });
 
-  $('.flaky').click(function(e) {
+  $('.flaky').click(function() {
     requestWithFallback('/flaky', fallback);
   });
 
-  $('.open').click(function(e) {
+  $('.open').click(function() {
     breaker.forceOpen();
   });
 
-  $('.close').click(function(e) {
+  $('.close').click(function() {
     breaker.forceClose();
   });
 
-  $('.unforce').click(function(e) {
+  $('.unforce').click(function() {
     breaker.unforce();
   });
 });

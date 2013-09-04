@@ -146,7 +146,7 @@
       }
       else {
         this._state = CircuitBreaker.CLOSED;
-        this.onCircuitClose();
+        this.onCircuitClose(metrics);
       }
     }
     else {
@@ -156,7 +156,7 @@
 
       if (overThreshold) {
         this._state = CircuitBreaker.OPEN;
-        this.onCircuitOpen();
+        this.onCircuitOpen(metrics);
       }
     }
   };

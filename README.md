@@ -63,15 +63,15 @@ For example, if the value is 20, then if only 19 requests are received in the ro
 
 *Default Value:* 5
 
-#### onCircuitOpen
+#### onCircuitOpen(metrics)
 
-Function that is run whenever the circuit is opened (i.e. the threshold is reached).
+Function that is run whenever the circuit is opened (i.e. the threshold is reached). Receives the metrics for the current window as an argument.
 
 *Default Value:* no-op
 
-#### onCircuitClose
+#### onCircuitClose(metrics)
 
-Function that is run whenever the circuit is closed (i.e. the service is back up).
+Function that is run whenever the circuit is closed (i.e. the service is back up). Receives the metrics for the current window as an argument.
 
 *Default Value:* no-op
 
