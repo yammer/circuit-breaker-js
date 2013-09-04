@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>circuit-breaker.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>circuit-breaker.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="keyword">function</span>() {
+  <span class="keyword">var</span> CircuitBreaker = <span class="keyword">function</span>(opts) {
+    opts = opts || {};
+
+    <span class="keyword">this</span>.windowDuration  = opts.windowDuration  || <span class="number">10000</span>; <span class="comment">// milliseconds</span>
+    <span class="keyword">this</span>.numBuckets      = opts.numBuckets      || <span class="number">10</span>;    <span class="comment">// number</span>
+    <span class="keyword">this</span>.timeoutDuration = opts.timeoutDuration || <span class="number">3000</span>;  <span class="comment">// milliseconds</span>
+    <span class="keyword">this</span>.errorThreshold  = opts.errorThreshold  || <span class="number">50</span>;    <span class="comment">// percentage</span>
+    <span class="keyword">this</span>.volumeThreshold = opts.volumeThreshold || <span class="number">5</span>;     <span class="comment">// number</span>
+
+    <span class="keyword">this</span>.onCircuitOpen   = opts.onCircuitOpen   || <span class="keyword">function</span>() {};
+    <span class="keyword">this</span>.onCircuitClose  = opts.onCircuitClose  || <span class="keyword">function</span>() {};
+
+    <span class="keyword">this</span>._buckets = [<span class="keyword">this</span>._createBucket()];
+    <span class="keyword">this</span>._state = CircuitBreaker.CLOSED;
+
+    <span class="keyword">this</span>._startTicker();
+  };
+
+  CircuitBreaker.OPEN = <span class="number">0</span>;
+  CircuitBreaker.HALF_OPEN = <span class="number">1</span>;
+  CircuitBreaker.CLOSED = <span class="number">2</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>PUBLIC</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  CircuitBreaker.prototype.run = <span class="keyword">function</span>(command, fallback) {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.isOpen()) {
+      <span class="keyword">this</span>._executeFallback(fallback || <span class="keyword">function</span>() {});
+    }
+    <span class="keyword">else</span> {
+      <span class="keyword">this</span>._executeCommand(command);
+    }
+  };
+
+  CircuitBreaker.prototype.forceClose = <span class="keyword">function</span>() {
+    <span class="keyword">this</span>._forced = <span class="keyword">this</span>._state;
+    <span class="keyword">this</span>._state = CircuitBreaker.CLOSED;
+  };
+
+  CircuitBreaker.prototype.forceOpen = <span class="keyword">function</span>() {
+    <span class="keyword">this</span>._forced = <span class="keyword">this</span>._state;
+    <span class="keyword">this</span>._state = CircuitBreaker.OPEN;
+  };
+
+  CircuitBreaker.prototype.unforce = <span class="keyword">function</span>() {
+    <span class="keyword">this</span>._state = <span class="keyword">this</span>._forced;
+    <span class="keyword">this</span>._forced = <span class="literal">null</span>;
+  };
+
+  CircuitBreaker.prototype.isOpen = <span class="keyword">function</span>() {
+    <span class="keyword">return</span> <span class="keyword">this</span>._state == CircuitBreaker.OPEN;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>PRIVATE</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  CircuitBreaker.prototype._startTicker = <span class="keyword">function</span>() {
+    <span class="keyword">var</span> self = <span class="keyword">this</span>;
+    <span class="keyword">var</span> bucketIndex = <span class="number">0</span>;
+    <span class="keyword">var</span> bucketDuration = <span class="keyword">this</span>.windowDuration / <span class="keyword">this</span>.numBuckets;
+
+    <span class="keyword">var</span> tick = <span class="keyword">function</span>() {
+      <span class="keyword">if</span> (self._buckets.length &gt; self.numBuckets) {
+        self._buckets.shift();
+      }
+
+      bucketIndex++;
+
+      <span class="keyword">if</span> (bucketIndex &gt; self.numBuckets) {
+        bucketIndex = <span class="number">0</span>;
+
+        <span class="keyword">if</span> (self.isOpen()) {
+          self._state = CircuitBreaker.HALF_OPEN;
+        }
+      }
+
+      self._buckets.push(self._createBucket());
+    };
+
+    setInterval(tick, bucketDuration);
+  };
+
+  CircuitBreaker.prototype._createBucket = <span class="keyword">function</span>() {
+    <span class="keyword">return</span> { failures: <span class="number">0</span>, successes: <span class="number">0</span>, timeouts: <span class="number">0</span>, shortCircuits: <span class="number">0</span> };
+  };
+
+  CircuitBreaker.prototype._lastBucket = <span class="keyword">function</span>() {
+    <span class="keyword">return</span> <span class="keyword">this</span>._buckets[<span class="keyword">this</span>._buckets.length - <span class="number">1</span>];
+  };
+
+  CircuitBreaker.prototype._executeCommand = <span class="keyword">function</span>(command) {
+    <span class="keyword">var</span> self = <span class="keyword">this</span>;
+    <span class="keyword">var</span> timeout;
+
+    <span class="keyword">var</span> increment = <span class="keyword">function</span>(prop) {
+      <span class="keyword">return</span> <span class="keyword">function</span>() {
+        <span class="keyword">if</span> (!timeout) { <span class="keyword">return</span>; }
+
+        <span class="keyword">var</span> bucket = self._lastBucket();
+        bucket[prop]++;
+
+        <span class="keyword">if</span> (self._forced == <span class="literal">null</span>) {
+          self._updateState();
+        }
+
+        clearTimeout(timeout);
+        timeout = <span class="literal">null</span>;
+      };
+    };
+
+    timeout = setTimeout(increment(<span class="string">'timeouts'</span>), <span class="keyword">this</span>.timeoutDuration);
+
+    command(increment(<span class="string">'successes'</span>), increment(<span class="string">'failures'</span>));
+  };
+
+  CircuitBreaker.prototype._executeFallback = <span class="keyword">function</span>(fallback) {
+    fallback();
+
+    <span class="keyword">var</span> bucket = <span class="keyword">this</span>._lastBucket();
+    bucket.shortCircuits++;
+  };
+
+  CircuitBreaker.prototype._calculateMetrics = <span class="keyword">function</span>() {
+    <span class="keyword">var</span> totalCount = <span class="number">0</span>, errorCount = <span class="number">0</span>, errorPercentage = <span class="number">0</span>;
+
+    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = <span class="keyword">this</span>._buckets.length; i &lt; l; i++) {
+      <span class="keyword">var</span> bucket = <span class="keyword">this</span>._buckets[i];
+      <span class="keyword">var</span> errors = (bucket.failures + bucket.timeouts);
+
+      errorCount += errors;
+      totalCount += (errors + bucket.successes);
+    }
+
+    errorPercentage = (errorCount / (totalCount &gt; <span class="number">0</span> ? totalCount : <span class="number">1</span>)) * <span class="number">100</span>;
+
+    <span class="keyword">return</span> { totalCount: totalCount, errorCount: errorCount, errorPercentage: errorPercentage };
+  };
+
+  CircuitBreaker.prototype._updateState = <span class="keyword">function</span>() {
+    <span class="keyword">var</span> metrics = <span class="keyword">this</span>._calculateMetrics();
+
+    <span class="keyword">if</span> (<span class="keyword">this</span>._state == CircuitBreaker.HALF_OPEN) {
+      <span class="keyword">var</span> lastCommandFailed = !<span class="keyword">this</span>._lastBucket().successes &amp;&amp; metrics.errorCount &gt; <span class="number">0</span>;
+
+      <span class="keyword">if</span> (lastCommandFailed) {
+        <span class="keyword">this</span>._state = CircuitBreaker.OPEN;
+      }
+      <span class="keyword">else</span> {
+        <span class="keyword">this</span>._state = CircuitBreaker.CLOSED;
+        <span class="keyword">this</span>.onCircuitClose(metrics);
+      }
+    }
+    <span class="keyword">else</span> {
+      <span class="keyword">var</span> overErrorThreshold = metrics.errorPercentage &gt; <span class="keyword">this</span>.errorThreshold;
+      <span class="keyword">var</span> overVolumeThreshold = metrics.totalCount &gt; <span class="keyword">this</span>.volumeThreshold;
+      <span class="keyword">var</span> overThreshold = overVolumeThreshold &amp;&amp; overErrorThreshold;
+
+      <span class="keyword">if</span> (overThreshold) {
+        <span class="keyword">this</span>._state = CircuitBreaker.OPEN;
+        <span class="keyword">this</span>.onCircuitOpen(metrics);
+      }
+    }
+  };
+
+  <span class="keyword">var</span> assign = <span class="keyword">function</span>(name, obj) {
+    <span class="keyword">var</span> commonJS = <span class="keyword">typeof</span> module != <span class="string">'undefined'</span> &amp;&amp; module.exports;
+
+    <span class="keyword">if</span> (commonJS) {
+      module.exports = obj;
+    }
+    <span class="keyword">else</span> {
+      window[name] = obj;
+    }
+  };
+
+  assign(<span class="string">'CircuitBreaker'</span>, CircuitBreaker);
+})();</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
