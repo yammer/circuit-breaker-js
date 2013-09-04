@@ -19,11 +19,23 @@ module.exports = function(grunt) {
           specs:   'spec/**/*.js'
         }
       }
+    },
+
+    jshint: {
+      all: ['Gruntfile.js', 'circuit-breaker.js'],
+      options: {
+        jshintrc: '.jshintrc'
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+
+  grunt.registerTask('lint',
+    'Lints the source',
+    ['jshint:all']);
 
   grunt.registerTask('test',
     'Runs the test suite in PhantomJS',
@@ -34,6 +46,6 @@ module.exports = function(grunt) {
     ['jasmine:all:build', 'connect:test:keepalive']);
 
   grunt.registerTask('default',
-    ['test']);
+    ['lint', 'test']);
 
 };
