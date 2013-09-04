@@ -29,7 +29,7 @@ describe('CircuitBreaker', function() {
 
   beforeEach(function() {
     jasmine.Clock.useMock();
-    breaker = new CircuitBreaker;
+    breaker = new CircuitBreaker();
   });
 
   describe('with a working service', function() {

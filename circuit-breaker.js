@@ -98,13 +98,13 @@
         var bucket = self._lastBucket();
         bucket[prop]++;
 
-        if (self._forced == null) { 
-          self._updateState(); 
+        if (self._forced == null) {
+          self._updateState();
         }
 
         clearTimeout(timeout);
         timeout = null;
-      }
+      };
     };
 
     timeout = setTimeout(increment('timeouts'), this.timeoutDuration);
@@ -133,7 +133,7 @@
     errorPercentage = (errorCount / (totalCount > 0 ? totalCount : 1)) * 100;
 
     return { totalCount: totalCount, errorCount: errorCount, errorPercentage: errorPercentage };
-  }
+  };
 
   CircuitBreaker.prototype._updateState = function() {
     var metrics = this._calculateMetrics();
@@ -162,7 +162,7 @@
   };
 
   var assign = function(name, obj) {
-    var commonJS = typeof module != "undefined" && module.exports;
+    var commonJS = typeof module != 'undefined' && module.exports;
 
     if (commonJS) {
       module.exports = obj;
