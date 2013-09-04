@@ -1,4 +1,4 @@
-# circuit-breaker.js
+# CircuitBreaker
 
 [Hystrix](https://github.com/Netflix/Hystrix)-like circuit breaker for JavaScript.
 

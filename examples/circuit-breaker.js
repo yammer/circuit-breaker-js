@@ -1,3 +1,8 @@
+// CircuitBreaker
+// ==============
+//
+// Hystrix-like circuit breaker for JavaScript.
+
 (function() {
   var CircuitBreaker = function(opts) {
     opts = opts || {};
@@ -21,7 +26,8 @@
   CircuitBreaker.HALF_OPEN = 1;
   CircuitBreaker.CLOSED = 2;
 
-  // PUBLIC
+  // Public API
+  // ----------
 
   CircuitBreaker.prototype.run = function(command, fallback) {
     if (this.isOpen()) {
@@ -51,7 +57,8 @@
     return this._state == CircuitBreaker.OPEN;
   };
 
-  // PRIVATE
+  // Private API
+  // -----------
 
   CircuitBreaker.prototype._startTicker = function() {
     var self = this;
