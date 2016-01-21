@@ -83,7 +83,7 @@
       self._buckets.push(self._createBucket());
     };
 
-    setInterval(tick, bucketDuration);
+    setInterval(tick, bucketDuration).unref();
   };
 
   CircuitBreaker.prototype._createBucket = function() {
