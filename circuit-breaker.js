@@ -22,9 +22,9 @@
     this._startTicker();
   };
 
-  CircuitBreaker.OPEN = 0;
-  CircuitBreaker.HALF_OPEN = 1;
-  CircuitBreaker.CLOSED = 2;
+  CircuitBreaker.OPEN = 'OPEN';
+  CircuitBreaker.HALF_OPEN = 'HALF_OPEN';
+  CircuitBreaker.CLOSED = 'CLOSED';
 
   // Public API
   // ----------
@@ -54,7 +54,7 @@
   };
 
   CircuitBreaker.prototype.isOpen = function() {
-    return this._state == CircuitBreaker.OPEN;
+    return this._state === CircuitBreaker.OPEN;
   };
 
   // Private API
@@ -105,7 +105,7 @@
         var bucket = self._lastBucket();
         bucket[prop]++;
 
-        if (self._forced == null) {
+        if (!self._forced) {
           self._updateState();
         }
 
@@ -145,7 +145,7 @@
   CircuitBreaker.prototype._updateState = function() {
     var metrics = this._calculateMetrics();
 
-    if (this._state == CircuitBreaker.HALF_OPEN) {
+    if (this._state === CircuitBreaker.HALF_OPEN) {
       var lastCommandFailed = !this._lastBucket().successes && metrics.errorCount > 0;
 
       if (lastCommandFailed) {
