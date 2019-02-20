@@ -154,6 +154,7 @@
 
       if (lastCommandFailed) {
         this._state = CircuitBreaker.OPEN;
+        this.onCircuitOpen(metrics);
       }
       else {
         this._state = CircuitBreaker.CLOSED;
