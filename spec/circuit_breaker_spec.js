@@ -394,6 +394,15 @@ describe('CircuitBreaker', function() {
       expect(command).toHaveBeenCalled();
       expect(breaker.isOpen()).toBe(false);
     });
+  });
 
+  describe('destroy', function(){
+    it('should stop creating new buckets', function(){
+      // Let it run to create some bucket
+      jasmine.Clock.tick(5001);
+
+      breaker.destroy();
+      expect(breaker._buckets.length).toEqual(6);
+    });
   });
 });

@@ -57,6 +57,10 @@
     return this._state == CircuitBreaker.OPEN;
   };
 
+  CircuitBreaker.prototype.destroy = function(){
+    clearInterval(this._interval);
+  };
+
   // Private API
   // -----------
 
@@ -83,7 +87,7 @@
       self._buckets.push(self._createBucket());
     };
 
-    setInterval(tick, bucketDuration);
+    this._interval = setInterval(tick, bucketDuration);
   };
 
   CircuitBreaker.prototype._createBucket = function() {
